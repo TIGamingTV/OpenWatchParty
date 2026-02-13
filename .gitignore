@@ -22,5 +22,8 @@ docs/.jekyll-cache/
 docs/.jekyll-metadata
 docs/Gemfile.lock
 
+# Claude Code
+CLAUDE.md
+
 # OS
 .DS_Store
