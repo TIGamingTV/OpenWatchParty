@@ -100,7 +100,6 @@ docs: update installation instructions
 
 ### 1. Before Submitting
 
-- [ ] Pre-commit hooks pass (`pre-commit run --all-files`)
 - [ ] Code follows project style
 - [ ] Tests pass (`just test`)
 - [ ] Documentation updated
@@ -254,10 +253,6 @@ just build
 ### Running CI Checks Locally
 
 ```bash
-# Run all pre-commit hooks (mirrors CI)
-pre-commit run --all-files
-
-# Or run individual checks
 just fmt      # Format Rust code
 just lint     # Run linters
 just test     # Run tests

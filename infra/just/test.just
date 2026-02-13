@@ -54,8 +54,3 @@ check:
     @cd {{server_dir}} && cargo check
     @echo -e "{{GREEN}}✓ Check passed{{RESET}}"
 
-[group('testing')]
-[doc('Run all pre-commit hooks manually')]
-pre-commit:
-    @echo -e "{{CYAN}}▶ Running pre-commit hooks...{{RESET}}"
-    @pre-commit run --all-files

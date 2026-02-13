@@ -4,23 +4,8 @@
 
 [group('setup')]
 [doc('Setup development environment')]
-setup: setup-hooks
+setup:
     @echo -e "{{GREEN}}✓ Development environment ready{{RESET}}"
-
-[group('setup')]
-[doc('Install pre-commit hooks')]
-setup-hooks:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    echo -e "{{CYAN}}▶ Installing pre-commit hooks...{{RESET}}"
-    if command -v pre-commit &> /dev/null; then
-        pre-commit install
-        pre-commit install --hook-type pre-push
-        echo -e "{{GREEN}}✓ Hooks installed{{RESET}}"
-    else
-        echo -e "{{YELLOW}}⚠ pre-commit not found. Install with: pip install pre-commit{{RESET}}"
-        exit 1
-    fi
 
 [group('setup')]
 [doc('Clean all build artifacts')]

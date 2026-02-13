@@ -94,54 +94,6 @@ docker pull ghcr.io/mhbxyz/owp-session-server:v0.1.0
 docker pull ghcr.io/mhbxyz/owp-session-server:beta
 ```
 
-## Pre-commit Hooks
-
-Local hooks mirror CI checks to catch issues before push.
-
-### Setup
-
-```bash
-# Install pre-commit
-pip install pre-commit
-
-# Install hooks
-just setup
-# or: pre-commit install
-```
-
-### Hooks Overview
-
-| Hook | Stage | Language | Check |
-|------|-------|----------|-------|
-| `cargo-fmt` | commit | Rust | Code formatting |
-| `cargo-clippy` | commit | Rust | Linting |
-| `cargo-test` | push | Rust | Unit tests |
-| `dotnet-build` | commit | C# | Compilation |
-| `dotnet-test` | push | C# | Unit tests |
-| `js-syntax` | commit | JavaScript | Syntax validation |
-| `trailing-whitespace` | commit | All | Whitespace cleanup |
-| `end-of-file-fixer` | commit | All | EOF newline |
-| `check-yaml` | commit | YAML | Syntax |
-| `check-json` | commit | JSON | Syntax |
-| `detect-private-key` | commit | All | Secret detection |
-| `hadolint` | commit | Dockerfile | Best practices |
-
-### Running Manually
-
-```bash
-# All hooks on staged files
-pre-commit run
-
-# All hooks on all files
-pre-commit run --all-files
-
-# Specific hook
-pre-commit run cargo-fmt --all-files
-
-# Skip hooks (emergency only)
-git commit --no-verify
-```
-
 ## Build Configuration
 
 ### Rust (Alpine + musl)
@@ -197,24 +149,6 @@ cd src/server && cargo clippy -- -D warnings
 ```bash
 # Test locally
 docker build -t test ./src/server
-```
-
-### Pre-commit Failures
-
-**Hook not running:**
-```bash
-# Reinstall hooks
-pre-commit install --install-hooks
-```
-
-**Outdated hooks:**
-```bash
-pre-commit autoupdate
-```
-
-**Skip specific hook:**
-```bash
-SKIP=cargo-test git commit -m "WIP"
 ```
 
 ## Badges
