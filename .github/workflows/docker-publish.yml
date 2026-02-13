@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'server/**'
+      - 'src/server/**'
   release:
     types: [published]
 
@@ -47,7 +47,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./server
+          context: ./src/server
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -70,25 +70,25 @@ jobs:
           dotnet-version: '9.0.x'
 
       - name: Copy JS files to plugin Web directory
-        working-directory: plugins/jellyfin
+        working-directory: src/plugins/jellyfin
         run: |
           mkdir -p OpenWatchParty/Web
           cp ../../clients/jellyfin-web/*.js OpenWatchParty/Web/
 
       - name: Build plugin
-        working-directory: plugins/jellyfin/OpenWatchParty
+        working-directory: src/plugins/jellyfin/OpenWatchParty
         run: dotnet publish -c Release -o dist
 
       - name: Create plugin zip
         run: |
-          cd plugins/jellyfin/OpenWatchParty/dist
+          cd src/plugins/jellyfin/OpenWatchParty/dist
           zip -r ../OpenWatchParty-${{ github.event.release.tag_name }}.zip .
 
       - name: Upload plugin artifact
         uses: actions/upload-artifact@v4
         with:
           name: jellyfin-plugin
-          path: plugins/jellyfin/OpenWatchParty/OpenWatchParty-${{ github.event.release.tag_name }}.zip
+          path: src/plugins/jellyfin/OpenWatchParty/OpenWatchParty-${{ github.event.release.tag_name }}.zip
 
   create-release-assets:
     name: Upload Release Assets

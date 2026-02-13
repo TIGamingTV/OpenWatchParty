@@ -81,11 +81,11 @@ make build
 
 ```bash
 # Rust session server
-cd server
+cd src/server
 cargo build --release
 
 # C# plugin
-cd plugins/jellyfin/OpenWatchParty
+cd src/plugins/jellyfin/OpenWatchParty
 dotnet build -c Release
 ```
 
@@ -93,8 +93,8 @@ dotnet build -c Release
 
 | Component | Output Location |
 |-----------|-----------------|
-| Session Server | `server/target/release/session-server` |
-| Plugin DLL | `plugins/jellyfin/OpenWatchParty/bin/Release/net9.0/OpenWatchParty.dll` |
+| Session Server | `src/server/target/release/session-server` |
+| Plugin DLL | `src/plugins/jellyfin/OpenWatchParty/bin/Release/net9.0/OpenWatchParty.dll` |
 
 ## Release Steps
 
@@ -197,7 +197,7 @@ docker pull ghcr.io/mhbxyz/openwatchparty-session-server:beta
 ### Build Locally (optional)
 
 ```bash
-docker build -t openwatchparty-session-server:local ./server
+docker build -t openwatchparty-session-server:local ./src/server
 ```
 
 ## Automated Releases
@@ -214,7 +214,7 @@ When you create a GitHub Release:
 
 ### What Happens on Push to Main
 
-When server code changes (`server/**`) are pushed to `main`:
+When server code changes (`src/server/**`) are pushed to `main`:
 
 1. **Docker Image**: Built and pushed with `beta` tag
 2. Allows testers to always have the latest development version

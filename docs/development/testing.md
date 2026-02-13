@@ -15,7 +15,7 @@ OpenWatchParty uses a combination of automated tests and manual testing procedur
 ### Rust Session Server
 
 ```bash
-cd server
+cd src/server
 
 # Run all tests
 cargo test
@@ -69,7 +69,7 @@ mod tests {
 ### C# Plugin
 
 ```bash
-cd plugins/jellyfin/OpenWatchParty
+cd src/plugins/jellyfin/OpenWatchParty
 
 # Run tests
 dotnet test
@@ -250,7 +250,7 @@ jobs:
         with:
           toolchain: stable
       - run: cargo test
-        working-directory: server
+        working-directory: src/server
 
   test-csharp:
     runs-on: ubuntu-latest
@@ -260,7 +260,7 @@ jobs:
         with:
           dotnet-version: '9.0'
       - run: dotnet test
-        working-directory: plugins/jellyfin/OpenWatchParty
+        working-directory: src/plugins/jellyfin/OpenWatchParty
 ```
 
 ## Debugging Test Failures
@@ -299,9 +299,9 @@ wscat -c ws://localhost:3000/ws
 
 | Component | Location |
 |-----------|----------|
-| Rust | `server/src/*.rs` (inline) |
-| Rust integration | `server/tests/` |
-| C# | `plugins/jellyfin/OpenWatchParty.Tests/` |
+| Rust | `src/server/src/*.rs` (inline) |
+| Rust integration | `src/server/tests/` |
+| C# | `src/plugins/jellyfin/OpenWatchParty.Tests/` |
 
 ### Test Naming
 

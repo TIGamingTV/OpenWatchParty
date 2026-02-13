@@ -85,7 +85,7 @@ docker run -d \
 
 ```bash
 # Build the image
-docker build -t openwatchparty-session-server ./server
+docker build -t openwatchparty-session-server ./src/server
 
 # Run the container
 docker run -d \
@@ -101,7 +101,7 @@ Requirements:
 - Rust 1.83+
 
 ```bash
-cd server
+cd src/server
 cargo build --release
 ./target/release/session-server
 ```

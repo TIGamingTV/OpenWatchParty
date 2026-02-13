@@ -203,11 +203,11 @@ Before submitting:
 
 ```bash
 # Rust tests
-cd server
+cd src/server
 cargo test
 
 # C# tests
-cd plugins/jellyfin
+cd src/plugins/jellyfin
 dotnet test OpenWatchParty.Tests/OpenWatchParty.Tests.csproj
 ```
 
@@ -236,12 +236,12 @@ All pull requests are validated by GitHub Actions CI. Your PR must pass all chec
 
 **Rust formatting:**
 ```bash
-cd server && cargo fmt
+cd src/server && cargo fmt
 ```
 
 **Clippy warnings:**
 ```bash
-cd server && cargo clippy -- -D warnings
+cd src/server && cargo clippy -- -D warnings
 # Fix the warnings or justify with #[allow(...)]
 ```
 

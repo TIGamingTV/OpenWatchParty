@@ -248,7 +248,7 @@ Termes techniques utilisés sans définition :
 ### 3.2 Architecture
 
 ```
-server/
+src/server/
 ├── src/
 │   ├── main.rs      # Setup serveur, routes
 │   ├── ws.rs        # Gestion messages WebSocket
@@ -393,7 +393,7 @@ info!("Client {} authenticated as {}", client_id, claims.name);
 ### 4.2 Architecture
 
 ```
-plugins/jellyfin/OpenWatchParty/
+src/plugins/jellyfin/OpenWatchParty/
 ├── Plugin.cs                    # Classe principale
 ├── Controllers/
 │   └── OpenWatchPartyController.cs  # API endpoints
@@ -526,7 +526,7 @@ if (_cachedScript == null) {
 ### 5.2 Architecture
 
 ```
-clients/jellyfin-web/
+src/clients/jellyfin-web/
 ├── state.js     # État global, constantes
 ├── utils.js     # Utilitaires (getVideo, escapeHtml, etc.)
 ├── ui.js        # Interface utilisateur, panels
@@ -725,7 +725,7 @@ setTimeout(() => connect(), 3000);  // Fixe 3s
 #### 6.2.2 Dockerfile Sans Utilisateur Non-Root
 
 **Sévérité :** Critique
-**Localisation :** `server/Dockerfile`
+**Localisation :** `src/server/Dockerfile`
 **Statut :** CORRIGÉ
 
 ~~Pas de USER directive = root !~~
@@ -761,7 +761,7 @@ setTimeout(() => connect(), 3000);  // Fixe 3s
 
 #### 6.3.3 Pas de HEALTHCHECK
 
-**Localisation :** `server/Dockerfile`
+**Localisation :** `src/server/Dockerfile`
 **Statut :** CORRIGÉ
 
 **Corrections appliquées :**
@@ -973,31 +973,31 @@ CMD ["session-server"]
 - docs/development/testing.md
 
 **Serveur Rust :**
-- server/src/main.rs
-- server/src/ws.rs
-- server/src/room.rs
-- server/src/messaging.rs
-- server/src/auth.rs
-- server/src/types.rs
-- server/src/utils.rs
-- server/Cargo.toml
+- src/server/src/main.rs
+- src/server/src/ws.rs
+- src/server/src/room.rs
+- src/server/src/messaging.rs
+- src/server/src/auth.rs
+- src/server/src/types.rs
+- src/server/src/utils.rs
+- src/server/Cargo.toml
 
 **Plugin Jellyfin :**
-- plugins/jellyfin/OpenWatchParty/Plugin.cs
-- plugins/jellyfin/OpenWatchParty/Controllers/OpenWatchPartyController.cs
-- plugins/jellyfin/OpenWatchParty/Configuration/PluginConfiguration.cs
-- plugins/jellyfin/OpenWatchParty/Web/configPage.html
-- plugins/jellyfin/OpenWatchParty/Web/plugin.js
-- plugins/jellyfin/OpenWatchParty/OpenWatchPartyPlugin.csproj
+- src/plugins/jellyfin/OpenWatchParty/Plugin.cs
+- src/plugins/jellyfin/OpenWatchParty/Controllers/OpenWatchPartyController.cs
+- src/plugins/jellyfin/OpenWatchParty/Configuration/PluginConfiguration.cs
+- src/plugins/jellyfin/OpenWatchParty/Web/configPage.html
+- src/plugins/jellyfin/OpenWatchParty/Web/plugin.js
+- src/plugins/jellyfin/OpenWatchParty/OpenWatchPartyPlugin.csproj
 
 **Client Web :**
-- clients/jellyfin-web/state.js
-- clients/jellyfin-web/utils.js
-- clients/jellyfin-web/ui.js
-- clients/jellyfin-web/playback.js
-- clients/jellyfin-web/ws.js
-- clients/jellyfin-web/app.js
-- clients/jellyfin-web/plugin.js
+- src/clients/jellyfin-web/state.js
+- src/clients/jellyfin-web/utils.js
+- src/clients/jellyfin-web/ui.js
+- src/clients/jellyfin-web/playback.js
+- src/clients/jellyfin-web/ws.js
+- src/clients/jellyfin-web/app.js
+- src/clients/jellyfin-web/plugin.js
 
 **Infrastructure :**
 - docker-compose.yml

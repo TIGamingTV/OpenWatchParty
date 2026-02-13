@@ -8,9 +8,9 @@ COMPOSE         := docker compose -f $(COMPOSE_FILE)
 COMPOSE_TOOLS   := docker compose --profile tools -f $(COMPOSE_FILE)
 
 # Directories
-PLUGIN_DIR      := plugins/jellyfin/OpenWatchParty
-CLIENT_DIR      := clients/jellyfin-web
-SERVER_DIR      := server
+PLUGIN_DIR      := src/plugins/jellyfin/OpenWatchParty
+CLIENT_DIR      := src/clients/jellyfin-web
+SERVER_DIR      := src/server
 DOCS_DIR        := docs
 
 # Containers

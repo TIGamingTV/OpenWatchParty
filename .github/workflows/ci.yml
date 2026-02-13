@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: server
+        working-directory: src/server
     steps:
       - uses: actions/checkout@v4
 
@@ -34,8 +34,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            server/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('server/Cargo.lock') }}
+            src/server/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('src/server/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: plugins/jellyfin
+        working-directory: src/plugins/jellyfin
     steps:
       - uses: actions/checkout@v4
 
@@ -89,7 +89,7 @@ jobs:
 
       - name: Check JS syntax
         run: |
-          for file in clients/jellyfin-web/*.js; do
+          for file in src/clients/jellyfin-web/*.js; do
             echo "Checking $file..."
             node --check "$file"
           done
@@ -107,7 +107,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ./server
+          context: ./src/server
           push: false
           tags: openwatchparty/session-server:test
           cache-from: type=gha

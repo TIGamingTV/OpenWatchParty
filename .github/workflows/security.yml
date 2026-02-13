@@ -24,7 +24,7 @@ jobs:
         run: cargo install cargo-audit
 
       - name: Run cargo audit
-        working-directory: server
+        working-directory: src/server
         run: cargo audit
 
   trivy-scan:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t openwatchparty/session-server:scan ./server
+        run: docker build -t openwatchparty/session-server:scan ./src/server
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master

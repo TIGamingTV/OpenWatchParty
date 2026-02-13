@@ -21,21 +21,21 @@ repos:
     hooks:
       - id: cargo-fmt
         name: cargo fmt
-        entry: bash -c 'cd server && cargo fmt'
+        entry: bash -c 'cd src/server && cargo fmt'
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-clippy
         name: cargo clippy
-        entry: bash -c 'cd server && cargo clippy -- -D warnings'
+        entry: bash -c 'cd src/server && cargo clippy -- -D warnings'
         language: system
         types: [rust]
         pass_filenames: false
 
       - id: cargo-test
         name: cargo test
-        entry: bash -c 'cd server && cargo test --quiet'
+        entry: bash -c 'cd src/server && cargo test --quiet'
         language: system
         types: [rust]
         pass_filenames: false
@@ -46,14 +46,14 @@ repos:
     hooks:
       - id: dotnet-build
         name: dotnet build
-        entry: bash -c 'cd plugins/jellyfin && dotnet build OpenWatchParty.Tests/OpenWatchParty.Tests.csproj --nologo -v q'
+        entry: bash -c 'cd src/plugins/jellyfin && dotnet build OpenWatchParty.Tests/OpenWatchParty.Tests.csproj --nologo -v q'
         language: system
         files: '\.cs$|\.csproj$'
         pass_filenames: false
 
       - id: dotnet-test
         name: dotnet test
-        entry: bash -c 'cd plugins/jellyfin && dotnet test OpenWatchParty.Tests/OpenWatchParty.Tests.csproj --nologo -v q --no-build'
+        entry: bash -c 'cd src/plugins/jellyfin && dotnet test OpenWatchParty.Tests/OpenWatchParty.Tests.csproj --nologo -v q --no-build'
         language: system
         files: '\.cs$|\.csproj$'
         pass_filenames: false
@@ -64,9 +64,9 @@ repos:
     hooks:
       - id: js-syntax
         name: js syntax check
-        entry: bash -c 'for f in clients/jellyfin-web/*.js; do node --check "$f" || exit 1; done'
+        entry: bash -c 'for f in src/clients/jellyfin-web/*.js; do node --check "$f" || exit 1; done'
         language: system
-        files: 'clients/jellyfin-web/.*\.js$'
+        files: 'src/clients/jellyfin-web/.*\.js$'
         pass_filenames: false
 
   # Dockerfile linting

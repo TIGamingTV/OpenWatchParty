@@ -1,7 +1,7 @@
 services:
   session-server:
     build:
-      context: ../../server
+      context: ../../src/server
       dockerfile: Dockerfile
       args:
         BUILD_MODE: dev  # Use "release" for production
@@ -34,8 +34,8 @@ services:
       - ./config:/config
       - jellyfin-cache:/cache
       - ${MEDIA_DIR:-${HOME}/Videos/Movies}:/media/Movies:ro
-      - ../../clients/jellyfin-web:/jellyfin/jellyfin-web/plugins/openwatchparty:ro
-      - ../../plugins/jellyfin/OpenWatchParty/dist:/config/plugins/OpenWatchParty
+      - ../../src/clients/jellyfin-web:/jellyfin/jellyfin-web/plugins/openwatchparty:ro
+      - ../../src/plugins/jellyfin/OpenWatchParty/dist:/config/plugins/OpenWatchParty
     restart: unless-stopped
     entrypoint:
       - /bin/bash
@@ -70,7 +70,7 @@ services:
     profiles:
       - tools
     volumes:
-      - ../../plugins/jellyfin/OpenWatchParty:/src
+      - ../../src/plugins/jellyfin/OpenWatchParty:/src
     environment:
       - HOME=/tmp
       - DOTNET_CLI_HOME=/tmp/.dotnet

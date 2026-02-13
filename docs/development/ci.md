@@ -57,7 +57,7 @@ Handles Docker image publishing to GHCR and release artifacts.
 
 | Event | Condition | Tags Generated |
 |-------|-----------|----------------|
-| Push to `main` | Changes in `server/**` | `beta` |
+| Push to `main` | Changes in `src/server/**` | `beta` |
 | GitHub Release | Published | `vX.Y.Z`, `vX.Y`, `latest` |
 
 #### Jobs
@@ -183,20 +183,20 @@ CI copies JavaScript files to the `Web/` directory before building:
 
 **Rust formatting:**
 ```bash
-cd server && cargo fmt
+cd src/server && cargo fmt
 git add -u && git commit --amend --no-edit
 ```
 
 **Clippy warnings:**
 ```bash
-cd server && cargo clippy -- -D warnings
+cd src/server && cargo clippy -- -D warnings
 # Fix warnings or add #[allow(...)] with justification
 ```
 
 **Docker build fails:**
 ```bash
 # Test locally
-docker build -t test ./server
+docker build -t test ./src/server
 ```
 
 ### Pre-commit Failures

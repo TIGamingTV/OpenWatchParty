@@ -13,7 +13,7 @@ The OpenWatchParty plugin integrates with Jellyfin's plugin architecture to serv
 ## Project Structure
 
 ```
-plugins/jellyfin/OpenWatchParty/
+src/plugins/jellyfin/OpenWatchParty/
 ├── Plugin.cs                     # Plugin entry point
 ├── OpenWatchParty.csproj         # Project file
 ├── Controllers/

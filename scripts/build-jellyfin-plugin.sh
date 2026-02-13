@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-PLUGIN_DIR="$ROOT_DIR/plugins/jellyfin/OpenWatchParty"
+PLUGIN_DIR="$ROOT_DIR/src/plugins/jellyfin/OpenWatchParty"
 DIST_DIR="$PLUGIN_DIR/dist"
-CLIENT_JS="$ROOT_DIR/clients/jellyfin-web/plugin.js"
+CLIENT_JS="$ROOT_DIR/src/clients/jellyfin-web/plugin.js"
 EMBEDDED_JS="$PLUGIN_DIR/Web/plugin.js"
 
 cd "$PLUGIN_DIR"

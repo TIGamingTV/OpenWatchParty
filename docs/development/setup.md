@@ -63,33 +63,34 @@ After running `make up`:
 
 ```
 OpenWatchParty/
-├── clients/
-│   └── jellyfin-web/          # JavaScript client modules
-│       ├── plugin.js        # Loader/entry point
-│       ├── state.js     # State management
-│       ├── utils.js     # Utilities
-│       ├── ui.js        # User interface
-│       ├── playback.js  # Video sync
-│       ├── ws.js        # WebSocket
-│       └── app.js       # Initialization
-│
-├── plugins/
-│   └── jellyfin/
-│       └── OpenWatchParty/  # C# Jellyfin plugin
-│           ├── Plugin.cs
-│           ├── Controllers/
-│           ├── Configuration/
-│           └── Web/         # Bundled JS (copied from clients/)
-│
-├── server/     # Rust WebSocket server
-│   ├── src/
-│   │   ├── main.rs
-│   │   ├── types.rs
-│   │   ├── ws.rs
-│   │   ├── room.rs
-│   │   ├── messaging.rs
-│   │   └── auth.rs
-│   └── Cargo.toml
+├── src/
+│   ├── clients/
+│   │   └── jellyfin-web/          # JavaScript client modules
+│   │       ├── plugin.js        # Loader/entry point
+│   │       ├── state.js     # State management
+│   │       ├── utils.js     # Utilities
+│   │       ├── ui.js        # User interface
+│   │       ├── playback.js  # Video sync
+│   │       ├── ws.js        # WebSocket
+│   │       └── app.js       # Initialization
+│   │
+│   ├── plugins/
+│   │   └── jellyfin/
+│   │       └── OpenWatchParty/  # C# Jellyfin plugin
+│   │           ├── Plugin.cs
+│   │           ├── Controllers/
+│   │           ├── Configuration/
+│   │           └── Web/         # Bundled JS (copied from clients/)
+│   │
+│   └── server/     # Rust WebSocket server
+│       ├── src/
+│       │   ├── main.rs
+│       │   ├── types.rs
+│       │   ├── ws.rs
+│       │   ├── room.rs
+│       │   ├── messaging.rs
+│       │   └── auth.rs
+│       └── Cargo.toml
 │
 ├── infra/
 │   └── docker/              # Docker configuration
@@ -219,7 +220,7 @@ If a hook fails:
 
 ### JavaScript Client
 
-1. **Edit files** in `clients/jellyfin-web/`
+1. **Edit files** in `src/clients/jellyfin-web/`
 2. **Restart Jellyfin** (automatically copies JS files):
    ```bash
    make restart-jellyfin
@@ -230,7 +231,7 @@ If a hook fails:
 
 ### Rust Session Server
 
-1. **Edit files** in `server/src/`
+1. **Edit files** in `src/server/src/`
 2. **Restart server** (rebuilds automatically):
    ```bash
    make restart-server
@@ -238,7 +239,7 @@ If a hook fails:
 
 ### C# Plugin
 
-1. **Edit files** in `plugins/jellyfin/OpenWatchParty/`
+1. **Edit files** in `src/plugins/jellyfin/OpenWatchParty/`
 2. **Build and restart**:
    ```bash
    make build && make restart-jellyfin
@@ -261,7 +262,7 @@ make restart-server
 
 For faster iteration, run locally:
 ```bash
-cd server
+cd src/server
 cargo watch -x run
 ```
 
@@ -372,14 +373,14 @@ wscat -c ws://localhost:3000/ws
 
 **Rust:**
 ```bash
-cd server
+cd src/server
 cargo clean
 cargo build
 ```
 
 **C#:**
 ```bash
-cd plugins/jellyfin/OpenWatchParty
+cd src/plugins/jellyfin/OpenWatchParty
 dotnet clean
 dotnet build
 ```
@@ -418,7 +419,7 @@ The project's `.cargo/config.toml` automatically uses mold when available.
 
 ### Cargo Configuration
 
-Located in `server/.cargo/config.toml`:
+Located in `src/server/.cargo/config.toml`:
 
 ```toml
 [build]

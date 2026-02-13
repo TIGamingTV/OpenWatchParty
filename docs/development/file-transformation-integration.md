@@ -86,8 +86,8 @@ public static string TransformIndexHtml(object payload)
 
 | File | Action |
 |------|--------|
-| `plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Create |
-| `plugins/jellyfin/OpenWatchParty/Plugin.cs` | Modify constructor |
+| `src/plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Create |
+| `src/plugins/jellyfin/OpenWatchParty/Plugin.cs` | Modify constructor |
 | `docs/operations/installation.md` | Add automatic option |
 
 ## Error Handling
