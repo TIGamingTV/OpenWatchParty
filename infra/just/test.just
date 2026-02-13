@@ -4,7 +4,7 @@
 
 [group('testing')]
 [doc('Run all tests')]
-test: test-server
+test: test-server test-plugin
 
 [group('testing')]
 [doc('Run Rust server tests')]
@@ -12,6 +12,17 @@ test-server:
     @echo -e "{{GREEN}}▶ Running server tests...{{RESET}}"
     @cd {{server_dir}} && cargo test
     @echo -e "{{GREEN}}✓ Tests passed{{RESET}}"
+
+[group('testing')]
+[doc('Run .NET plugin tests')]
+test-plugin:
+    @echo -e "{{GREEN}}▶ Running plugin tests...{{RESET}}"
+    @docker run --rm \
+        -v "{{justfile_directory()}}/src/plugins/jellyfin:/src" \
+        -w /src \
+        mcr.microsoft.com/dotnet/sdk:9.0 \
+        dotnet test OpenWatchParty.Tests/
+    @echo -e "{{GREEN}}✓ Plugin tests passed{{RESET}}"
 
 [group('testing')]
 [doc('Run all linters (Rust + JS)')]

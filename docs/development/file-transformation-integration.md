@@ -4,10 +4,7 @@ parent: Development
 nav_order: 5
 ---
 
-# File Transformation Integration Plan
-
-{: .note }
-This is a planned feature, not yet implemented.
+# File Transformation Integration
 
 ## Overview
 
@@ -86,9 +83,9 @@ public static string TransformIndexHtml(object payload)
 
 | File | Action |
 |------|--------|
-| `src/plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Create |
-| `src/plugins/jellyfin/OpenWatchParty/Plugin.cs` | Modify constructor |
-| `docs/operations/installation.md` | Add automatic option |
+| `src/plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Created |
+| `src/plugins/jellyfin/OpenWatchParty/OpenWatchPartyPlugin.csproj` | Added Newtonsoft.Json |
+| `docs/operations/installation.md` | Added automatic option |
 
 ## Error Handling
 

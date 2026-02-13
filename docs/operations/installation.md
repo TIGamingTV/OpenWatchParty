@@ -36,6 +36,12 @@ This starts:
 
 ### 3. Enable the Client Script
 
+#### Option A: Automatic Injection (Recommended)
+
+Install [jellyfin-plugin-file-transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) and restart Jellyfin. OpenWatchParty will automatically register a transformation that injects the client script into `index.html` — no configuration needed.
+
+#### Option B: Manual (Custom HTML)
+
 1. Log in to Jellyfin as an administrator
 2. Go to **Dashboard** > **General**
 3. Scroll to **Custom HTML** (Branding section)

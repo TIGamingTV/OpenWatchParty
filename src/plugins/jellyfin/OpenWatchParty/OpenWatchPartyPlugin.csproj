@@ -20,6 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Jellyfin.Controller" Version="10.11.5" />
     <PackageReference Include="Jellyfin.Model" Version="10.11.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.35.0" />
   </ItemGroup>
