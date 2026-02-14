@@ -98,10 +98,12 @@ public class FileTransformationIntegration : IScheduledTask
     /// </summary>
     public static string TransformIndexHtml(object payload)
     {
-        var contents = payload?.GetType()
-            .GetProperty("contents")?
-            .GetValue(payload)?
-            .ToString();
+        var contents = payload is JObject jobj
+            ? jobj["contents"]?.ToString()
+            : payload?.GetType()
+                .GetProperty("contents")?
+                .GetValue(payload)?
+                .ToString();
 
         if (string.IsNullOrEmpty(contents) || contents.Contains("/OpenWatchParty/ClientScript"))
         {

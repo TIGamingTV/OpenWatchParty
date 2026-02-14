@@ -26,7 +26,6 @@ services:
     image: mcr.microsoft.com/dotnet/sdk:9.0
     working_dir: /src
     network_mode: host
-    user: "${UID:-1000}:${GID:-1000}"
     profiles:
       - tools
     volumes:
