@@ -493,12 +493,18 @@
             ui.showToast('Host paused playback');
 
           } else if (msg.payload.action === 'seek') {
-            // Use play_state from message if available, otherwise assume paused
             const hostPlayState = msg.payload.play_state || 'paused';
             state.lastSyncPlayState = hostPlayState;
             if (hostPlayState === 'playing') {
-              // HOST is playing after seek - resume playback
-              state.syncCooldownUntil = utils.nowMs() + 2000;  // Reduced from 5000ms (UX-P1)
+              // Pre-compensate for client buffering: seek slightly ahead so the
+              // client starts closer to where the host will be after buffering.
+              // Without this, drift is ~0.5s (= client buffer time at new position).
+              video.currentTime = msg.payload.position + (OWP.constants.SYNC_LEAD_MS / 1000);
+              // Use raw host position as sync baseline so syncLoop correctly
+              // measures the remaining drift after lead compensation.
+              state.lastSyncServerTs = utils.getServerNow();
+              state.lastSyncPosition = msg.payload.position;
+              state.syncCooldownUntil = utils.nowMs() + 2000;
               video.play().catch(() => {});
             }
 
