@@ -48,6 +48,7 @@ RESET  := '\033[0m'
 
 # -- Imports -----------------------------------------------------------------
 
+import 'infra/just/help.just'
 import 'infra/just/dev.just'
 import 'infra/just/build.just'
 import 'infra/just/test.just'
