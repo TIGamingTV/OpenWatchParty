@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+
+# --- Script injection (requires root) ---
+
 # Backup original index.html if not exists
 if [ ! -f /jellyfin/jellyfin-web/index.html.bak ]; then
   cp /jellyfin/jellyfin-web/index.html /jellyfin/jellyfin-web/index.html.bak
@@ -17,6 +22,8 @@ sed -i 's|<script src="/web/plugins/openwatchparty/plugin.js[^"]*"></script>||g'
 TS=$(date +%s)
 sed -i "s|</body>|<script src=\"/web/plugins/openwatchparty/plugin.js?v=$TS\"></script></body>|" /jellyfin/jellyfin-web/index.html
 
-echo "Restored and injected index.html with v=$TS"
+echo "Injected index.html with v=$TS"
 
-exec /jellyfin/jellyfin
+# --- Drop privileges ---
+chown -R "$PUID:$PGID" /config /cache
+exec setpriv --reugid="$PUID:$PGID" --clear-groups /jellyfin/jellyfin

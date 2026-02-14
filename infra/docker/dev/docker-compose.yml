@@ -26,6 +26,9 @@ services:
   jellyfin-dev:
     image: jellyfin/jellyfin:10.11.3
     container_name: jellyfin-dev
+    environment:
+      - PUID=${UID:-1000}
+      - PGID=${GID:-1000}
     depends_on:
       - session-server
     ports:
