@@ -1,5 +1,5 @@
 # Build stage
-FROM rust:1.83-alpine AS builder
+FROM rust:1.88-alpine AS builder
 
 # Build mode: "dev" (fast compile, debug) or "release" (optimized)
 ARG BUILD_MODE=dev
