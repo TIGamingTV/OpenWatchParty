@@ -20,6 +20,9 @@ test-plugin:
     @docker run --rm \
         -v "{{justfile_directory()}}/src/plugins/jellyfin:/src" \
         -w /src \
+        -u "$(id -u):$(id -g)" \
+        -e HOME=/tmp \
+        -e DOTNET_CLI_HOME=/tmp/.dotnet \
         mcr.microsoft.com/dotnet/sdk:9.0 \
         dotnet test OpenWatchParty.Tests/
     @echo -e "{{GREEN}}✓ Plugin tests passed{{RESET}}"
