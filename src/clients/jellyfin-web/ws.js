@@ -2,7 +2,7 @@
   const OWP = window.OpenWatchParty = window.OpenWatchParty || {};
   if (OWP.actions) return;
 
-  const { DEFAULT_WS_URL, SEEK_THRESHOLD, RECONNECT_BASE_MS, RECONNECT_MAX_MS, TIME_SYNC_MAX_SAMPLES, TIME_SYNC_EMA_ALPHA } = OWP.constants;
+  const { DEFAULT_WS_URL, SEEK_THRESHOLD, RECONNECT_BASE_MS, RECONNECT_MAX_MS, TIME_SYNC_MAX_SAMPLES, TIME_SYNC_EMA_ALPHA, PING_INIT_MS, PING_STABLE_MS, PING_STABLE_AFTER } = OWP.constants;
   const state = OWP.state;
   const utils = OWP.utils;
   const ui = OWP.ui;
@@ -193,6 +193,18 @@
     }
   };
 
+  const schedulePing = () => {
+    if (state.intervals.ping) clearInterval(state.intervals.ping);
+    const interval = state.successfulPings >= PING_STABLE_AFTER
+      ? PING_STABLE_MS
+      : PING_INIT_MS;
+    state.intervals.ping = setInterval(() => {
+      if (state.ws && state.ws.readyState === 1) {
+        send('ping', { client_ts: utils.nowMs() });
+      }
+    }, interval);
+  };
+
   const connect = async () => {
     // Guard against multiple simultaneous connection attempts
     if (state.isConnecting) {
@@ -256,7 +268,9 @@
         state.ws.send(JSON.stringify({ type: 'auth', payload: authPayload, ts: utils.nowMs() }));
       }
       // Send immediate ping for faster clock sync (fixes 5.6)
-      state.ws.send(JSON.stringify({ type: 'ping', payload: { client_ts: utils.nowMs() }, ts: utils.nowMs() }));
+      send('ping', { client_ts: utils.nowMs() });
+      // Start adaptive ping interval (resets to fast on each new connection)
+      schedulePing();
       ui.render();
     };
     state.ws.onerror = (err) => {
@@ -266,6 +280,7 @@
     state.ws.onclose = (e) => {
       console.log('[OpenWatchParty] WebSocket closed:', e.code, e.reason);
       state.isConnecting = false;
+      state.successfulPings = 0;   // Reset adaptive ping counter
       state.timeSyncSamples = [];  // Reset time sync samples on disconnect
       ui.render();
       // Only auto-reconnect if flag is set and not already connecting
@@ -361,10 +376,9 @@
 
           if (Math.abs(video.currentTime - targetPos) > SEEK_THRESHOLD) {
             video.currentTime = targetPos;
-            // Update sync state to match our seek target - prevents drift chase
-            // after buffering (otherwise syncLoop sees drift from old server_ts)
-            state.lastSyncServerTs = utils.getServerNow();
-            state.lastSyncPosition = targetPos;
+            // Keep baseline at (msg.server_ts, basePos) from above — this tracks
+            // the host's actual position. After HLS buffering, syncLoop will
+            // re-seek to where the host is NOW (post-buffer correction).
           }
           if (hostPlaying) {
             video.play().catch(() => {});
@@ -599,6 +613,20 @@
               : bestSample.offset;
             state.hasTimeSync = true;
 
+            // Adaptive ping: transition fast → stable after PING_STABLE_AFTER pongs
+            const wasInit = state.successfulPings < PING_STABLE_AFTER;
+            state.successfulPings++;
+            if (wasInit && state.successfulPings >= PING_STABLE_AFTER) {
+              schedulePing();
+            }
+
+            // Detect network change: large offset delta → reset to fast polling
+            const delta = Math.abs(state.serverOffsetMs - prevOffset);
+            if (state.successfulPings >= PING_STABLE_AFTER && delta > 50) {
+              state.successfulPings = 0;
+              schedulePing();
+            }
+
             // Log clock sync periodically (every ~10 pings to reduce noise)
             if (Math.random() < 0.1) {
               utils.log('CLOCK', { rtt, best_rtt: bestSample.rtt, server_offset: state.serverOffsetMs, delta: state.serverOffsetMs - prevOffset, samples: state.timeSyncSamples.length });
@@ -621,6 +649,7 @@
     createRoom,
     joinRoom,
     leaveRoom,
-    connect
+    connect,
+    schedulePing
   };
 })();

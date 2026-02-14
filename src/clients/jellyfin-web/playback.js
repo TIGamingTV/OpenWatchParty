@@ -282,6 +282,18 @@
     if (state.isInitialSync) {
       const now = utils.nowMs();
 
+      // Post-buffer correction: after the initial join seek, HLS buffers for ~1s
+      // during which the host advances. Re-seek once to the host's current position.
+      // initialSyncTargetPos is non-zero only until this correction fires.
+      if (state.initialSyncTargetPos && abs > INITIAL_SYNC_DRIFT_THRESHOLD) {
+        utils.log('SYNC', { type: 'post_buffer_seek', drift, videoPos: video.currentTime, expected });
+        video.currentTime = expected;
+        state.lastSyncServerTs = serverNow;
+        state.lastSyncPosition = expected;
+        state.initialSyncTargetPos = 0;
+        return;
+      }
+
       // If drift is too large (>10s in either direction), do immediate HARD_SEEK
       // This catches both Jellyfin resume jumps (ahead) and HLS segment issues (behind)
       // Trying to catch up 10+ seconds at 2x would take too long

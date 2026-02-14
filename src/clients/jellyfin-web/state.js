@@ -60,7 +60,9 @@
     DRIFT_GAIN: 0.50,             // For sqrt curve: 0.50 * sqrt(1s) = 0.50 → 1.50x at 1s drift
     // Interval timings (P2 optimization)
     UI_CHECK_MS: 2000,            // UI button injection check
-    PING_MS: 10000,               // Ping interval (increased from 3s)
+    PING_INIT_MS: 2000,            // Fast ping interval (clock convergence)
+    PING_STABLE_MS: 30000,         // Stable ping interval (after convergence)
+    PING_STABLE_AFTER: 5,          // Pongs before switching to stable interval
     HOME_REFRESH_MS: 5000,        // Home watch parties refresh (increased from 2s)
     SYNC_LOOP_MS: 500,            // Sync loop for playback rate correction
     RECONNECT_BASE_MS: 1000,      // Base reconnect delay (1s)
@@ -92,6 +94,7 @@
     // Log buffering (for logs sent before WS connected)
     logBuffer: [],
     logBufferMax: 100,
+    successfulPings: 0,
     serverOffsetMs: 0,
     timeSyncSamples: [],         // Circular buffer of { rtt, offset, ts } for hybrid time sync
     lastSeekSentAt: 0,

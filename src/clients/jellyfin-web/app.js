@@ -6,7 +6,7 @@
   const ui = OWP.ui;
   const utils = OWP.utils;
   const playback = OWP.playback;
-  const { UI_CHECK_MS, PING_MS, HOME_REFRESH_MS, SYNC_LOOP_MS } = OWP.constants;
+  const { UI_CHECK_MS, HOME_REFRESH_MS, SYNC_LOOP_MS } = OWP.constants;
 
   const clearAllIntervals = () => {
     if (state.intervals.ui) { clearInterval(state.intervals.ui); state.intervals.ui = null; }
@@ -109,13 +109,6 @@
         }
       }
     }, UI_CHECK_MS);
-
-    // Ping interval - only when connected
-    state.intervals.ping = setInterval(() => {
-      if (state.ws && state.ws.readyState === 1) {
-        OWP.actions.send('ping', { client_ts: utils.nowMs() });
-      }
-    }, PING_MS);
 
     // Home watch parties refresh - only when on home view AND tab is visible (fixes M-P05)
     state.intervals.home = setInterval(() => {
