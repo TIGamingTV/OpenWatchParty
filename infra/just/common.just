@@ -38,3 +38,11 @@ CYAN   := '\033[0;36m'
 RED    := '\033[0;31m'
 BOLD   := '\033[1m'
 RESET  := '\033[0m'
+
+# -- File Transformation plugin ------------------------------------------------
+
+ft_version := "2.5.3.0"
+ft_abi     := "10.11.3"
+ft_url     := "https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/download/" + ft_version + "/Release-" + ft_abi + ".zip"
+ft_dir     := "infra/docker/config/plugins/FileTransformation"
+ft_marker  := ft_dir + "/.version"

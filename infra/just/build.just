@@ -6,6 +6,24 @@ set working-directory := "../.."
 
 import "common.just"
 
+[doc('Download File Transformation plugin if not present')]
+ft:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -f "{{ft_marker}}" ] && [ "$(cat "{{ft_marker}}")" = "{{ft_version}}" ]; then
+        echo -e "{{GREEN}}✓ File Transformation {{ft_version}} already present{{RESET}}"
+        exit 0
+    fi
+    echo -e "{{CYAN}}▶ Downloading File Transformation plugin {{ft_version}}...{{RESET}}"
+    tmpzip=$(mktemp /tmp/ft-plugin-XXXXXX.zip)
+    trap 'rm -f "$tmpzip"' EXIT
+    curl -fsSL -o "$tmpzip" "{{ft_url}}"
+    rm -rf "{{ft_dir}}"
+    mkdir -p "{{ft_dir}}"
+    unzip -qo "$tmpzip" -d "{{ft_dir}}"
+    echo "{{ft_version}}" > "{{ft_marker}}"
+    echo -e "{{GREEN}}✓ File Transformation {{ft_version}} installed{{RESET}}"
+
 [default]
 [doc('Build the Jellyfin plugin (copies JS + dotnet publish)')]
 plugin:
@@ -29,5 +47,5 @@ image:
     @echo -e "{{GREEN}}✓ Docker image built{{RESET}}"
 
 [doc('Build everything (plugin + server image)')]
-all: plugin image
+all: ft plugin image
     @echo -e "{{GREEN}}✓ All components built{{RESET}}"

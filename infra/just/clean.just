@@ -8,7 +8,7 @@ import "common.just"
 
 [default]
 [doc('Clean all build artifacts')]
-default: plugin server
+default: plugin server ft
     @rm -rf dist {{project_name}}-release.zip
     @echo -e "{{GREEN}}✓ Cleaned{{RESET}}"
 
@@ -26,6 +26,11 @@ plugin:
 server:
     @echo -e "{{YELLOW}}▶ Cleaning server artifacts...{{RESET}}"
     @rm -rf {{server_dir}}/target
+
+[doc('Clean File Transformation plugin')]
+ft:
+    @echo -e "{{YELLOW}}▶ Cleaning File Transformation plugin...{{RESET}}"
+    @rm -rf {{ft_dir}}
 
 [doc('Remove Docker images and volumes')]
 docker:

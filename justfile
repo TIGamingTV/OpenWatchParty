@@ -71,6 +71,7 @@ default:
 
 [doc('Start the full stack (Jellyfin + session server)')]
 up:
+    @just build ft
     @just build plugin
     @echo -e "{{GREEN}}▶ Starting services...{{RESET}}"
     @{{compose}} up -d session-server jellyfin-dev
