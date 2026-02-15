@@ -80,3 +80,113 @@ pub(in crate::ws) async fn handle_leave_room(client_id: &str, clients: &Clients,
     }
     broadcast_room_list(clients, rooms).await;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+
+    #[tokio::test]
+    async fn handle_ping_responds_pong() {
+        let clients = test_helpers::create_clients();
+        let (client, mut rx) = test_helpers::create_client_with_rx("u1", "User", true);
+        clients.write().await.insert("c1".to_string(), client);
+
+        let parsed = IncomingMessage {
+            msg_type: crate::types::ClientMessageType::Ping,
+            room: Some("room-1".to_string()),
+            client: Some("c1".to_string()),
+            payload: Some(serde_json::json!({ "seq": 42 })),
+            ts: 12345,
+            server_ts: None,
+        };
+        handle_ping("c1", &parsed, &clients).await;
+
+        let msg = test_helpers::recv_msg(&mut rx).unwrap();
+        assert_eq!(msg.msg_type, "pong");
+        assert_eq!(msg.room, Some("room-1".to_string()));
+        let seq = msg.payload.unwrap().get("seq").unwrap().as_i64().unwrap();
+        assert_eq!(seq, 42);
+    }
+
+    #[tokio::test]
+    async fn handle_ready_adds_to_set() {
+        let clients = test_helpers::create_clients();
+        let rooms = test_helpers::create_rooms();
+        let (host, _rx_h) = test_helpers::create_client_with_rx("uh", "Host", true);
+        let (guest, _rx_g) = test_helpers::create_client_with_rx("ug", "Guest", true);
+
+        {
+            let mut lc = clients.write().await;
+            lc.insert("host".to_string(), host);
+            lc.insert("guest".to_string(), guest);
+        }
+        {
+            let mut lr = rooms.write().await;
+            let mut room = test_helpers::create_room("room-1", "host");
+            room.clients.push("guest".to_string());
+            room.ready_clients.clear();
+            lr.insert("room-1".to_string(), room);
+        }
+
+        let parsed = IncomingMessage {
+            msg_type: crate::types::ClientMessageType::Ready,
+            room: Some("room-1".to_string()),
+            client: Some("guest".to_string()),
+            payload: None,
+            ts: 0,
+            server_ts: None,
+        };
+        handle_ready("guest", &parsed, &clients, &rooms).await;
+
+        let lr = rooms.read().await;
+        let room = lr.get("room-1").unwrap();
+        assert!(room.ready_clients.contains("guest"));
+    }
+
+    #[tokio::test]
+    async fn handle_ready_all_ready_triggers_play() {
+        let clients = test_helpers::create_clients();
+        let rooms = test_helpers::create_rooms();
+        let (host, mut rx_h) = test_helpers::create_client_with_rx("uh", "Host", true);
+        let (guest, mut rx_g) = test_helpers::create_client_with_rx("ug", "Guest", true);
+
+        {
+            let mut lc = clients.write().await;
+            lc.insert("host".to_string(), host);
+            lc.insert("guest".to_string(), guest);
+        }
+        {
+            let mut lr = rooms.write().await;
+            let mut room = test_helpers::create_room("room-1", "host");
+            room.clients = vec!["host".to_string(), "guest".to_string()];
+            room.ready_clients.clear();
+            room.ready_clients.insert("host".to_string());
+            room.pending_play = Some(crate::types::PendingPlay {
+                position: 10.0,
+                created_at: crate::utils::now_ms(),
+            });
+            lr.insert("room-1".to_string(), room);
+        }
+
+        let parsed = IncomingMessage {
+            msg_type: crate::types::ClientMessageType::Ready,
+            room: Some("room-1".to_string()),
+            client: Some("guest".to_string()),
+            payload: None,
+            ts: 0,
+            server_ts: None,
+        };
+        handle_ready("guest", &parsed, &clients, &rooms).await;
+
+        // Both should receive a player_event (play broadcast)
+        let msg_h = test_helpers::recv_msg(&mut rx_h).unwrap();
+        assert_eq!(msg_h.msg_type, "player_event");
+        let msg_g = test_helpers::recv_msg(&mut rx_g).unwrap();
+        assert_eq!(msg_g.msg_type, "player_event");
+
+        // pending_play should be cleared
+        let lr = rooms.read().await;
+        assert!(lr.get("room-1").unwrap().pending_play.is_none());
+    }
+}

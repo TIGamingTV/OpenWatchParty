@@ -109,3 +109,30 @@ pub(in crate::ws) async fn handle_chat_message(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn validate_chat_valid() {
+        assert!(validate_chat("Hello world").is_ok());
+    }
+
+    #[test]
+    fn validate_chat_empty() {
+        assert!(validate_chat("").is_err());
+    }
+
+    #[test]
+    fn validate_chat_too_long() {
+        let long = "a".repeat(MAX_CHAT_MESSAGE_LENGTH + 1);
+        assert!(validate_chat(&long).is_err());
+    }
+
+    #[test]
+    fn validate_chat_at_limit() {
+        let exact = "a".repeat(MAX_CHAT_MESSAGE_LENGTH);
+        assert!(validate_chat(&exact).is_ok());
+    }
+}

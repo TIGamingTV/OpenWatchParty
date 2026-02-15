@@ -220,3 +220,160 @@ pub(in crate::ws) async fn handle_playback(
         schedule_pending_play(room_id, created_at, clients.clone(), rooms.clone());
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+
+    #[test]
+    fn should_process_state_update_play_state_change() {
+        let room = test_helpers::create_room("r1", "host");
+        let payload = serde_json::json!({ "position": 0.0, "play_state": "playing" });
+        assert!(should_process_state_update(&room, &payload, now_ms()));
+    }
+
+    #[test]
+    fn should_process_state_update_during_cooldown() {
+        let mut room = test_helpers::create_room("r1", "host");
+        let now = now_ms();
+        room.last_command_ts = now; // Just issued a command
+        room.last_state_ts = now;
+        let payload = serde_json::json!({ "position": 0.1, "play_state": "paused" });
+        assert!(!should_process_state_update(&room, &payload, now + 100));
+    }
+
+    #[test]
+    fn should_process_state_update_jitter() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.state.position = 10.0;
+        room.last_state_ts = 0;
+        let payload = serde_json::json!({ "position": 10.2, "play_state": "paused" });
+        // 0.2 < POSITION_JITTER_THRESHOLD (0.5), should be filtered
+        assert!(!should_process_state_update(&room, &payload, now_ms()));
+    }
+
+    #[test]
+    fn should_process_state_update_significant_move() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.state.position = 10.0;
+        room.last_state_ts = 0;
+        let payload = serde_json::json!({ "position": 15.0, "play_state": "paused" });
+        assert!(should_process_state_update(&room, &payload, now_ms()));
+    }
+
+    #[test]
+    fn absorb_during_pending_state_update() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.pending_play = Some(PendingPlay {
+            position: 5.0,
+            created_at: now_ms(),
+        });
+        let parsed = IncomingMessage {
+            msg_type: ClientMessageType::StateUpdate,
+            room: Some("r1".to_string()),
+            client: None,
+            payload: Some(serde_json::json!({ "position": 6.0 })),
+            ts: 0,
+            server_ts: None,
+        };
+        assert!(absorb_during_pending(&mut room, &parsed, None, now_ms()));
+    }
+
+    #[test]
+    fn absorb_during_pending_pause_not_absorbed() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.pending_play = Some(PendingPlay {
+            position: 5.0,
+            created_at: now_ms(),
+        });
+        let parsed = IncomingMessage {
+            msg_type: ClientMessageType::PlayerEvent,
+            room: Some("r1".to_string()),
+            client: None,
+            payload: Some(serde_json::json!({ "action": "pause" })),
+            ts: 0,
+            server_ts: None,
+        };
+        assert!(!absorb_during_pending(
+            &mut room,
+            &parsed,
+            Some("pause"),
+            now_ms()
+        ));
+    }
+
+    #[test]
+    fn absorb_no_pending() {
+        let mut room = test_helpers::create_room("r1", "host");
+        let parsed = IncomingMessage {
+            msg_type: ClientMessageType::StateUpdate,
+            room: Some("r1".to_string()),
+            client: None,
+            payload: Some(serde_json::json!({ "position": 6.0 })),
+            ts: 0,
+            server_ts: None,
+        };
+        assert!(!absorb_during_pending(&mut room, &parsed, None, now_ms()));
+    }
+
+    #[test]
+    fn handle_play_not_ready_creates_pending() {
+        let mut room = test_helpers::create_room("r1", "host");
+        assert!(room.pending_play.is_none());
+        let result = handle_play_not_ready(&mut room, 10.0, now_ms());
+        assert!(result.is_some());
+        assert!(room.pending_play.is_some());
+        assert!((room.pending_play.as_ref().unwrap().position - 10.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn handle_play_not_ready_existing_pending() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.pending_play = Some(PendingPlay {
+            position: 5.0,
+            created_at: now_ms(),
+        });
+        let result = handle_play_not_ready(&mut room, 15.0, now_ms());
+        assert!(result.is_none()); // Returns None when pending already exists
+        assert!((room.pending_play.as_ref().unwrap().position - 15.0).abs() < f64::EPSILON);
+    }
+
+    #[test]
+    fn apply_state_changes_updates_room() {
+        let mut room = test_helpers::create_room("r1", "host");
+        let mut parsed = IncomingMessage {
+            msg_type: ClientMessageType::StateUpdate,
+            room: Some("r1".to_string()),
+            client: None,
+            payload: Some(serde_json::json!({ "position": 42.0, "play_state": "playing" })),
+            ts: 0,
+            server_ts: None,
+        };
+        let now = now_ms();
+        apply_state_changes(&mut room, &mut parsed, None, now);
+        assert!((room.state.position - 42.0).abs() < f64::EPSILON);
+        assert_eq!(room.state.play_state, "playing");
+        assert_eq!(room.last_state_ts, now);
+    }
+
+    #[test]
+    fn apply_state_changes_player_event_play() {
+        let mut room = test_helpers::create_room("r1", "host");
+        let mut parsed = IncomingMessage {
+            msg_type: ClientMessageType::PlayerEvent,
+            room: Some("r1".to_string()),
+            client: None,
+            payload: Some(serde_json::json!({ "action": "play", "position": 10.0 })),
+            ts: 0,
+            server_ts: None,
+        };
+        let now = now_ms();
+        apply_state_changes(&mut room, &mut parsed, Some("play"), now);
+        assert_eq!(room.state.play_state, "playing");
+        assert_eq!(room.last_command_ts, now);
+        // server_ts should be set to target_server_ts
+        assert!(parsed.server_ts.is_some());
+        assert!(parsed.server_ts.unwrap() > now);
+    }
+}

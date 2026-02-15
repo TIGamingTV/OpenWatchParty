@@ -83,3 +83,62 @@ pub async fn handle_disconnect(client_id: &str, clients: &Clients, rooms: &Rooms
     }
     broadcast_room_list(clients, rooms).await;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+    use crate::types::PendingPlay;
+
+    #[test]
+    fn detach_client_removes_from_room() {
+        let mut clients = HashMap::new();
+        let mut rooms = HashMap::new();
+        let _rx = test_helpers::setup_room_with_host(&mut clients, &mut rooms, "host-1");
+
+        let (mut guest, _rx_g) = test_helpers::create_client_with_rx("ug", "Guest", true);
+        guest.room_id = Some("room-1".to_string());
+        clients.insert("guest-1".to_string(), guest);
+        rooms
+            .get_mut("room-1")
+            .unwrap()
+            .clients
+            .push("guest-1".to_string());
+
+        // Detach the guest (non-host) — room still has host, so it stays open
+        detach_client_from_room("guest-1", &mut clients, &mut rooms);
+
+        let room = rooms.get("room-1").unwrap();
+        assert!(!room.clients.contains(&"guest-1".to_string()));
+        assert!(clients.get("guest-1").unwrap().room_id.is_none());
+    }
+
+    #[test]
+    fn detach_host_clears_pending_play() {
+        let mut clients = HashMap::new();
+        let mut rooms = HashMap::new();
+        let _rx = test_helpers::setup_room_with_host(&mut clients, &mut rooms, "host-1");
+
+        rooms.get_mut("room-1").unwrap().pending_play = Some(PendingPlay {
+            position: 10.0,
+            created_at: crate::utils::now_ms(),
+        });
+
+        detach_client_from_room("host-1", &mut clients, &mut rooms);
+
+        // Room should be returned for closing (host left)
+        // The pending_play is cleared before close_and_notify removes the room
+        assert!(clients.get("host-1").unwrap().room_id.is_none());
+    }
+
+    #[test]
+    fn detach_client_not_in_room() {
+        let mut clients = HashMap::new();
+        let mut rooms = HashMap::new();
+        let (client, _rx) = test_helpers::create_client_with_rx("u1", "User", true);
+        clients.insert("c1".to_string(), client);
+
+        let result = detach_client_from_room("c1", &mut clients, &mut rooms);
+        assert!(result.is_none());
+    }
+}

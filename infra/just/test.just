@@ -7,8 +7,8 @@ set working-directory := "../.."
 import "common.just"
 
 [default]
-[doc('Run all tests (Rust + .NET)')]
-default: server plugin
+[doc('Run all tests (Rust + .NET + JS)')]
+default: server plugin client
 
 [doc('Run Rust server tests')]
 server:
@@ -28,3 +28,9 @@ plugin:
         mcr.microsoft.com/dotnet/sdk:9.0 \
         dotnet test OpenWatchParty.Tests/
     @echo -e "{{GREEN}}✓ Plugin tests passed{{RESET}}"
+
+[doc('Run JavaScript client tests')]
+client:
+    @echo -e "{{GREEN}}▶ Running client tests...{{RESET}}"
+    @node --test {{client_dir}}/tests/*.test.js
+    @echo -e "{{GREEN}}✓ Client tests passed{{RESET}}"

@@ -109,3 +109,54 @@ pub(super) async fn client_msg(
         ClientMessageType::Unknown => handle_unknown(client_id, clients).await,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+
+    #[tokio::test]
+    async fn check_rate_limit_under() {
+        let clients = test_helpers::create_clients();
+        let (client, _rx) = test_helpers::create_client_with_rx("u1", "User", true);
+        clients.write().await.insert("c1".to_string(), client);
+        let limited = check_rate_limit("c1", &clients).await;
+        assert!(!limited);
+    }
+
+    #[tokio::test]
+    async fn check_rate_limit_at_limit() {
+        use super::super::constants::RATE_LIMIT_MESSAGES;
+        let clients = test_helpers::create_clients();
+        let (client, _rx) = test_helpers::create_client_with_rx("u1", "User", true);
+        clients.write().await.insert("c1".to_string(), client);
+        for _ in 0..RATE_LIMIT_MESSAGES {
+            check_rate_limit("c1", &clients).await;
+        }
+        // Next message should be rate limited
+        let limited = check_rate_limit("c1", &clients).await;
+        assert!(limited);
+    }
+
+    #[tokio::test]
+    async fn is_authenticated_true() {
+        let clients = test_helpers::create_clients();
+        let (client, _rx) = test_helpers::create_client_with_rx("u1", "User", true);
+        clients.write().await.insert("c1".to_string(), client);
+        assert!(is_authenticated("c1", &clients).await);
+    }
+
+    #[tokio::test]
+    async fn is_authenticated_false() {
+        let clients = test_helpers::create_clients();
+        let (client, _rx) = test_helpers::create_client_with_rx("u1", "User", false);
+        clients.write().await.insert("c1".to_string(), client);
+        assert!(!is_authenticated("c1", &clients).await);
+    }
+
+    #[tokio::test]
+    async fn is_authenticated_not_found() {
+        let clients = test_helpers::create_clients();
+        assert!(!is_authenticated("nonexistent", &clients).await);
+    }
+}

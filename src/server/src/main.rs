@@ -7,6 +7,9 @@ mod types;
 mod utils;
 mod ws;
 
+#[cfg(test)]
+mod test_helpers;
+
 use crate::auth::JwtConfig;
 use crate::types::{Clients, Rooms};
 use log::info;

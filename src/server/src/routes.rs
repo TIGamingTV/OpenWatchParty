@@ -107,3 +107,55 @@ pub fn build_health_route(
         })
         .with(cors)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn is_origin_allowed_exact_match() {
+        let allowed = Arc::new(vec!["https://example.com".to_string()]);
+        assert!(is_origin_allowed("https://example.com", &allowed));
+    }
+
+    #[test]
+    fn is_origin_allowed_no_match() {
+        let allowed = Arc::new(vec!["https://example.com".to_string()]);
+        assert!(!is_origin_allowed("https://other.com", &allowed));
+    }
+
+    #[test]
+    fn is_origin_allowed_wildcard() {
+        let allowed = Arc::new(vec!["*".to_string()]);
+        assert!(is_origin_allowed("https://anything.com", &allowed));
+    }
+
+    #[test]
+    fn is_origin_allowed_empty_list() {
+        let allowed = Arc::new(vec![]);
+        assert!(!is_origin_allowed("https://example.com", &allowed));
+    }
+
+    #[test]
+    fn is_origin_allowed_multiple_origins() {
+        let allowed = Arc::new(vec![
+            "https://a.com".to_string(),
+            "https://b.com".to_string(),
+        ]);
+        assert!(is_origin_allowed("https://b.com", &allowed));
+        assert!(!is_origin_allowed("https://c.com", &allowed));
+    }
+
+    #[test]
+    fn get_allowed_origins_default() {
+        // Without modifying env vars, just verify the parsing logic:
+        // The function splits on comma, trims, and filters empty
+        let result = get_allowed_origins();
+        assert!(!result.is_empty());
+        // Each entry should be trimmed (no leading/trailing whitespace)
+        for origin in &result {
+            assert_eq!(origin, origin.trim());
+            assert!(!origin.is_empty());
+        }
+    }
+}

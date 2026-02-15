@@ -90,3 +90,38 @@ pub async fn client_connection(
 
     crate::room::handle_disconnect(&temp_id, &clients, &rooms).await;
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn register_client_jwt_disabled() {
+        let (tx, _rx) = mpsc::channel(10);
+        let jwt_config = Arc::new(JwtConfig {
+            secret: String::new(),
+            audience: "test".to_string(),
+            issuer: "test".to_string(),
+            enabled: false,
+        });
+        let client = register_client(tx, &jwt_config);
+        assert!(client.authenticated);
+        assert_eq!(client.user_id, "anonymous");
+        assert_eq!(client.user_name, "Anonymous");
+    }
+
+    #[test]
+    fn register_client_jwt_enabled() {
+        let (tx, _rx) = mpsc::channel(10);
+        let jwt_config = Arc::new(JwtConfig {
+            secret: "some-secret".to_string(),
+            audience: "test".to_string(),
+            issuer: "test".to_string(),
+            enabled: true,
+        });
+        let client = register_client(tx, &jwt_config);
+        assert!(!client.authenticated);
+        assert_eq!(client.user_id, "");
+        assert_eq!(client.user_name, "");
+    }
+}

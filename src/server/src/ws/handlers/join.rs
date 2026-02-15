@@ -108,3 +108,51 @@ pub(in crate::ws) async fn handle_join_room(
     add_client_to_room(client_id, room, &mut locked_clients, &payload_name);
     notify_join(client_id, room, &locked_clients);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+
+    #[test]
+    fn add_client_to_room_updates_state() {
+        let mut clients = HashMap::new();
+        let (client, _rx) = test_helpers::create_client_with_rx("u2", "Guest", true);
+        clients.insert("guest-1".to_string(), client);
+        let mut room = test_helpers::create_room("room-1", "host-1");
+
+        add_client_to_room("guest-1", &mut room, &mut clients, &None);
+
+        assert!(room.clients.contains(&"guest-1".to_string()));
+        assert_eq!(
+            clients.get("guest-1").unwrap().room_id,
+            Some("room-1".to_string())
+        );
+    }
+
+    #[test]
+    fn add_client_to_room_clears_ready() {
+        let mut clients = HashMap::new();
+        let (client, _rx) = test_helpers::create_client_with_rx("u2", "Guest", true);
+        clients.insert("guest-1".to_string(), client);
+        let mut room = test_helpers::create_room("room-1", "host-1");
+        room.ready_clients.insert("guest-1".to_string());
+
+        add_client_to_room("guest-1", &mut room, &mut clients, &None);
+
+        assert!(!room.ready_clients.contains("guest-1"));
+    }
+
+    #[test]
+    fn add_client_to_room_with_payload_name() {
+        let mut clients = HashMap::new();
+        let (client, _rx) = test_helpers::create_client_with_rx("u2", "OldName", true);
+        clients.insert("guest-1".to_string(), client);
+        let mut room = test_helpers::create_room("room-1", "host-1");
+
+        let payload_name = Some("NewName".to_string());
+        add_client_to_room("guest-1", &mut room, &mut clients, &payload_name);
+
+        assert_eq!(clients.get("guest-1").unwrap().user_name, "NewName");
+    }
+}

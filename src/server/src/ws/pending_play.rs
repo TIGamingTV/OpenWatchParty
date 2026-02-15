@@ -53,3 +53,34 @@ pub(super) fn schedule_pending_play(
         }
     });
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_helpers;
+    use std::collections::HashSet;
+
+    #[test]
+    fn all_ready_true() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.clients = vec!["host".to_string(), "guest".to_string()];
+        room.ready_clients = HashSet::from(["host".to_string(), "guest".to_string()]);
+        assert!(all_ready(&room));
+    }
+
+    #[test]
+    fn all_ready_false() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.clients = vec!["host".to_string(), "guest".to_string()];
+        room.ready_clients = HashSet::from(["host".to_string()]);
+        assert!(!all_ready(&room));
+    }
+
+    #[test]
+    fn all_ready_empty_room() {
+        let mut room = test_helpers::create_room("r1", "host");
+        room.clients.clear();
+        room.ready_clients.clear();
+        assert!(all_ready(&room));
+    }
+}

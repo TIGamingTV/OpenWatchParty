@@ -77,7 +77,7 @@ jobs:
         run: dotnet test OpenWatchParty.Tests/OpenWatchParty.Tests.csproj --no-build --verbosity normal
 
   js-lint:
-    name: JavaScript Lint
+    name: JavaScript Lint & Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,6 +93,9 @@ jobs:
             echo "Checking $file..."
             node --check "$file"
           done
+
+      - name: Run JS tests
+        run: node --test src/clients/jellyfin-web/tests/*.test.js
 
   build-server:
     name: Build Server
