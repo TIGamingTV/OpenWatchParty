@@ -12,8 +12,15 @@
                     <div class="verticalSection">
                         <h2 class="sectionTitle">Authentication</h2>
                         <div class="inputContainer">
-                            <input is="emby-input" type="password" id="JwtSecret" label="JWT Secret" autocomplete="new-password" />
-                            <div class="fieldDescription">Secret used to sign and verify session tokens (min 32 characters). Leave empty to keep current value. If not configured, authentication is disabled.</div>
+                            <div style="display:flex;align-items:flex-end;gap:.5em">
+                                <div style="flex:1">
+                                    <input is="emby-input" type="password" id="JwtSecret" label="JWT Secret" autocomplete="new-password" />
+                                </div>
+                                <button is="emby-button" type="button" id="toggleJwtSecret" class="raised" style="margin-bottom:.3em;min-width:auto;padding:.4em .8em" title="Show/Hide">
+                                    <span class="material-icons" style="font-size:1.3em">visibility</span>
+                                </button>
+                            </div>
+                            <div class="fieldDescription">Secret used to sign and verify session tokens (min 32 characters). Clear to disable authentication.</div>
                         </div>
                         <div class="inputContainer">
                             <input is="emby-input" type="text" id="JwtAudience" label="JWT Audience" />
@@ -67,6 +74,18 @@
                 }
             };
 
+            $('#toggleJwtSecret').on('click', function () {
+                var input = document.getElementById('JwtSecret');
+                var icon = this.querySelector('.material-icons');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.textContent = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    icon.textContent = 'visibility';
+                }
+            });
+
             $('.pluginConfigurationPage').on('pageshow', function () {
                 var page = this;
                 Dashboard.showLoadingMsg();
@@ -76,9 +95,7 @@
                     return ApiClient.getPluginConfiguration(OpenWatchPartyConfigurationPage.pluginId);
                 }).then(function (config) {
                     // Authentication settings
-                    // Don't expose secret - show placeholder if configured
-                    $('#JwtSecret', page).val('');
-                    $('#JwtSecret', page).attr('placeholder', config.JwtSecret ? '••••••••' : 'Not configured');
+                    $('#JwtSecret', page).val(config.JwtSecret || '');
                     $('#JwtAudience', page).val(config.JwtAudience || 'OpenWatchParty');
                     $('#JwtIssuer', page).val(config.JwtIssuer || 'Jellyfin');
                     $('#TokenTtlSeconds', page).val(config.TokenTtlSeconds || 3600);
@@ -100,11 +117,7 @@
 
                 ApiClient.getPluginConfiguration(OpenWatchPartyConfigurationPage.pluginId).then(function (config) {
                     // Authentication settings
-                    // Only update secret if a new value is provided
-                    var newSecret = $('#JwtSecret', page).val();
-                    if (newSecret) {
-                        config.JwtSecret = newSecret;
-                    }
+                    config.JwtSecret = $('#JwtSecret', page).val();
                     config.JwtAudience = $('#JwtAudience', page).val();
                     config.JwtIssuer = $('#JwtIssuer', page).val();
                     config.TokenTtlSeconds = parseInt($('#TokenTtlSeconds', page).val(), 10) || 3600;
@@ -114,7 +127,7 @@
 
                     return ApiClient.updatePluginConfiguration(OpenWatchPartyConfigurationPage.pluginId, config);
                 }).then(function () {
-                    Dashboard.processServerConfigurationUpdateResult();
+                    Dashboard.processPluginConfigurationUpdateResult();
                 }).catch(function (err) {
                     Dashboard.hideLoadingMsg();
                     Dashboard.alert('Failed to save configuration: ' + (err.message || 'Unknown error'));

@@ -240,12 +240,13 @@ public class OpenWatchPartyController : ControllerBase
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId),
             new Claim(JwtRegisteredClaimNames.Name, userName),
-            new Claim(JwtRegisteredClaimNames.Aud, config.JwtAudience),
-            new Claim(JwtRegisteredClaimNames.Iss, config.JwtIssuer),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
 
+        // Note: aud and iss are set via constructor parameters only — adding them
+        // to the claims array too would produce JSON arrays instead of strings,
+        // which breaks deserialization on the Rust session server.
         var token = new JwtSecurityToken(
             issuer: config.JwtIssuer,
             audience: config.JwtAudience,

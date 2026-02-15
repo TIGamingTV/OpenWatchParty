@@ -34,6 +34,20 @@
     return { apiClient, accessToken, serverAddress };
   };
 
+  const waitForApiClient = (maxWaitMs = 10000, intervalMs = 250) => {
+    return new Promise((resolve) => {
+      let elapsed = 0;
+      const check = () => {
+        const result = getApiAccessToken();
+        if (result) return resolve(result);
+        elapsed += intervalMs;
+        if (elapsed >= maxWaitMs) return resolve(null);
+        setTimeout(check, intervalMs);
+      };
+      check();
+    });
+  };
+
   const scheduleTokenRefresh = (expiresInSec) => {
     if (state.tokenRefreshTimer) {
       clearTimeout(state.tokenRefreshTimer);
@@ -61,9 +75,13 @@
 
   const fetchAuthToken = async () => {
     try {
-      const apiAccess = getApiAccessToken();
+      let apiAccess = getApiAccessToken();
       if (!apiAccess) {
-        console.warn('[OpenWatchParty] ApiClient not available, auth disabled');
+        console.log('[OpenWatchParty] Waiting for ApiClient...');
+        apiAccess = await waitForApiClient();
+      }
+      if (!apiAccess) {
+        console.warn('[OpenWatchParty] ApiClient not available after waiting, auth disabled');
         state.userName = getJellyfinUsername();
         return null;
       }
