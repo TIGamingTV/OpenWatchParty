@@ -3,7 +3,7 @@
 .env
 
 # Docker config
-infra/docker/config/
+infra/docker/dev/config/
 
 # Python
 __pycache__/

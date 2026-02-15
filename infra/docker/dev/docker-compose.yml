@@ -34,12 +34,12 @@ services:
     ports:
       - "${JELLYFIN_PORT:-8096}:8096"
     volumes:
-      - ../config:/config
+      - ./config:/config
       - jellyfin-cache:/cache
       - ${MEDIA_DIR:-${HOME}/Videos/Movies}:/media/Movies:ro
       - ../../../src/clients/jellyfin-web:/jellyfin/jellyfin-web/plugins/openwatchparty:ro
       - ../../../src/plugins/jellyfin/OpenWatchParty/dist:/config/plugins/OpenWatchParty
-      - ../scripts/jellyfin-entrypoint.sh:/jellyfin-entrypoint.sh:ro
+      - ./scripts/jellyfin-entrypoint.sh:/jellyfin-entrypoint.sh:ro
     restart: unless-stopped
     entrypoint: /jellyfin-entrypoint.sh
 
