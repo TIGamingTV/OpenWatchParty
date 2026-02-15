@@ -48,4 +48,10 @@
     ui.showToast(reason);
     ui.render();
   };
+
+  h.handleError = (msg) => {
+    const message = msg.payload?.message || 'Unknown error';
+    console.error('[OpenWatchParty] Server error:', message);
+    ui.showToast(message);
+  };
 })();

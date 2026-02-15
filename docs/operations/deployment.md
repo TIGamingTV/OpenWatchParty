@@ -100,7 +100,7 @@ jellyfin.example.com {
     reverse_proxy jellyfin:8096
 
     # WebSocket for session server
-    handle_path /ws* {
+    handle /ws {
         reverse_proxy session-server:3000
     }
 }
@@ -217,14 +217,24 @@ Set JWT Secret in both:
 - Plugin configuration (Jellyfin Dashboard)
 - Session server environment variable
 
-### 3. Restrict CORS
+### 3. Configure Session Server URL
+
+When using a reverse proxy, set the WebSocket URL in the plugin settings so the client connects through the proxy instead of directly to port 3000:
+
+1. Go to **Dashboard > Plugins > OpenWatchParty**
+2. Set **Session Server URL** to `wss://jellyfin.example.com/ws`
+3. Click **Save**
+
+Without this, the client defaults to `ws://<current-host>:3000/ws`, which is not reachable through a reverse proxy.
+
+### 4. Restrict CORS
 
 ```yaml
 environment:
   - ALLOWED_ORIGINS=https://jellyfin.example.com
 ```
 
-### 4. Use Read-Only Volumes
+### 5. Use Read-Only Volumes
 
 ```yaml
 volumes:
@@ -232,7 +242,7 @@ volumes:
   - /path/to/media:/media:ro
 ```
 
-### 5. Drop Capabilities
+### 6. Drop Capabilities
 
 ```yaml
 services:
