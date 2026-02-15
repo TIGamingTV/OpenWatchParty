@@ -14,7 +14,8 @@ bin/
 obj/
 src/plugins/jellyfin/OpenWatchParty/dist/
 src/plugins/jellyfin/OpenWatchParty/refs/
-src/plugins/jellyfin/OpenWatchParty/Web/
+src/plugins/jellyfin/OpenWatchParty/Web/*
+!src/plugins/jellyfin/OpenWatchParty/Web/configPage.html
 
 # Rust build artifacts
 src/server/target/
