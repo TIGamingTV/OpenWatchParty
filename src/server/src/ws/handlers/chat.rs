@@ -1,5 +1,5 @@
-use super::constants::MAX_CHAT_MESSAGE_LENGTH;
-use super::dispatch::send_error;
+use super::super::constants::MAX_CHAT_MESSAGE_LENGTH;
+use super::super::dispatch::send_error;
 use crate::types::{Clients, IncomingMessage, Rooms, WsMessage};
 use crate::utils::now_ms;
 use tokio::sync::mpsc;
@@ -48,7 +48,7 @@ fn collect_chat_senders(
     Some((senders, json))
 }
 
-pub(super) async fn handle_chat_message(
+pub(in crate::ws) async fn handle_chat_message(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,

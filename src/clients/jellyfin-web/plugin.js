@@ -62,10 +62,10 @@
     await loadScript('ws/send.js');
     await loadScript('ws/auth.js');
     await Promise.all([
-      loadScript('ws/handlers-room.js'),
-      loadScript('ws/handlers-sync.js'),
-      loadScript('ws/handlers-playback.js'),
-      loadScript('ws/handlers-clock.js'),
+      loadScript('ws/handlers/room.js'),
+      loadScript('ws/handlers/sync.js'),
+      loadScript('ws/handlers/playback.js'),
+      loadScript('ws/handlers/clock.js'),
     ]);
     await loadScript('ws/connection.js');
     await loadScript('app/lifecycle.js');

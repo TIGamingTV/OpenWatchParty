@@ -1,6 +1,6 @@
-use super::constants::MAX_CLIENTS_PER_ROOM;
-use super::dispatch::{is_authenticated, send_error};
-use super::validation::sanitize_name;
+use super::super::constants::MAX_CLIENTS_PER_ROOM;
+use super::super::dispatch::{is_authenticated, send_error};
+use super::super::validation::sanitize_name;
 use crate::messaging::{broadcast_to_room, send_to_client};
 use crate::types::{Client, Clients, IncomingMessage, Room, Rooms, WsMessage};
 use crate::utils::now_ms;
@@ -63,7 +63,7 @@ fn notify_join(
     );
 }
 
-pub(super) async fn handle_join_room(
+pub(in crate::ws) async fn handle_join_room(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,

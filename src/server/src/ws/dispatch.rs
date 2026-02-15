@@ -1,10 +1,9 @@
 use super::constants::MAX_MESSAGE_SIZE;
-use super::handle_auth::handle_auth;
-use super::handle_chat::handle_chat_message;
-use super::handle_create::handle_create_room;
-use super::handle_join::handle_join_room;
-use super::handle_misc::{handle_client_log, handle_leave_room, handle_ping, handle_ready, handle_unknown};
-use super::handle_playback::handle_playback;
+use super::handlers::{
+    handle_auth, handle_chat_message, handle_create_room, handle_join_room,
+    handle_client_log, handle_leave_room, handle_ping, handle_ready, handle_unknown,
+    handle_playback,
+};
 use crate::auth::JwtConfig;
 use crate::messaging::{send_room_list, send_to_client};
 use crate::types::{ClientMessageType, Clients, IncomingMessage, Rooms, WsMessage};

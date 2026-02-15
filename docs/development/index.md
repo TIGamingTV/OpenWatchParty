@@ -13,3 +13,4 @@ Contribute to OpenWatchParty development.
 - [Testing](testing) - Running tests
 - [CI/CD](ci) - Continuous integration
 - [Release](release) - Release process
+- [File Transformation Integration](file-transformation-integration) - Automatic script injection

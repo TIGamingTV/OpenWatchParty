@@ -1,13 +1,13 @@
-use super::constants::PLAY_SCHEDULE_MS;
-use super::dispatch::send_error;
-use super::pending_play::{all_ready, broadcast_scheduled_play};
+use super::super::constants::PLAY_SCHEDULE_MS;
+use super::super::dispatch::send_error;
+use super::super::pending_play::{all_ready, broadcast_scheduled_play};
 use crate::messaging::{broadcast_room_list, send_to_client};
 use crate::room::handle_leave;
 use crate::types::{Clients, IncomingMessage, Rooms, WsMessage};
 use crate::utils::now_ms;
 use log::{info, warn};
 
-pub(super) async fn handle_ping(
+pub(in crate::ws) async fn handle_ping(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,
@@ -27,7 +27,7 @@ pub(super) async fn handle_ping(
     );
 }
 
-pub(super) fn handle_client_log(client_id: &str, parsed: &IncomingMessage) {
+pub(in crate::ws) fn handle_client_log(client_id: &str, parsed: &IncomingMessage) {
     if let Some(payload) = &parsed.payload {
         let category = payload
             .get("category")
@@ -42,12 +42,12 @@ pub(super) fn handle_client_log(client_id: &str, parsed: &IncomingMessage) {
     }
 }
 
-pub(super) async fn handle_unknown(client_id: &str, clients: &Clients) {
+pub(in crate::ws) async fn handle_unknown(client_id: &str, clients: &Clients) {
     warn!("Unknown message type from client {}", client_id);
     send_error(client_id, clients, "Unknown message type").await;
 }
 
-pub(super) async fn handle_ready(
+pub(in crate::ws) async fn handle_ready(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,
@@ -71,7 +71,7 @@ pub(super) async fn handle_ready(
     }
 }
 
-pub(super) async fn handle_leave_room(
+pub(in crate::ws) async fn handle_leave_room(
     client_id: &str,
     clients: &Clients,
     rooms: &Rooms,

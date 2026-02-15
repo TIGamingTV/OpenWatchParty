@@ -1,9 +1,9 @@
-use super::constants::{
+use super::super::constants::{
     COMMAND_COOLDOWN_MS, CONTROL_SCHEDULE_MS, MIN_STATE_UPDATE_INTERVAL_MS, PLAY_SCHEDULE_MS,
     POSITION_JITTER_THRESHOLD,
 };
-use super::pending_play::{all_ready, schedule_pending_play};
-use super::validation::{is_valid_play_state, is_valid_position};
+use super::super::pending_play::{all_ready, schedule_pending_play};
+use super::super::validation::{is_valid_play_state, is_valid_position};
 use crate::types::{
     ClientMessageType, Clients, IncomingMessage, PendingPlay, Room, Rooms,
 };
@@ -134,7 +134,7 @@ fn apply_state_changes(
     }
 }
 
-pub(super) async fn handle_playback(
+pub(in crate::ws) async fn handle_playback(
     client_id: &str,
     mut parsed: IncomingMessage,
     clients: &Clients,

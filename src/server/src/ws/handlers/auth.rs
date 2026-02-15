@@ -1,5 +1,5 @@
-use super::dispatch::send_error;
-use super::validation::sanitize_name;
+use super::super::dispatch::send_error;
+use super::super::validation::sanitize_name;
 use crate::auth::JwtConfig;
 use crate::messaging::send_to_client;
 use crate::types::{Clients, IncomingMessage, WsMessage};
@@ -63,7 +63,7 @@ async fn handle_identity(client_id: &str, payload: &serde_json::Value, clients: 
     }
 }
 
-pub(super) async fn handle_auth(
+pub(in crate::ws) async fn handle_auth(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,

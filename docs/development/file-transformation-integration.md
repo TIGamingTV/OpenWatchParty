@@ -10,18 +10,9 @@ nav_order: 5
 
 This document describes how to integrate OpenWatchParty with the [jellyfin-plugin-file-transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) to automatically inject the client script into Jellyfin's `index.html`, eliminating the manual Custom HTML configuration step.
 
-## Current State
+## How It Works
 
-**Manual injection required:**
-1. Admin adds `<script src="/OpenWatchParty/ClientScript"></script>` to Jellyfin's Dashboard > General > Custom HTML
-2. Browser hard refresh required after configuration
-
-## Target State
-
-**Automatic injection:**
-1. On plugin load, detect and register with file-transformation plugin
-2. Transformation callback injects script tag into `index.html` before `</body>`
-3. Falls back gracefully to manual method if file-transformation is not installed
+When Jellyfin loads OpenWatchParty, the plugin detects whether the [file-transformation](https://github.com/IAmParadox27/jellyfin-plugin-file-transformation) plugin is installed. If found, it registers a transformation that automatically injects the client `<script>` tag into `index.html` before `</body>`. If file-transformation is not installed, the admin can still inject the script manually via Dashboard > General > Custom HTML.
 
 ## File-Transformation API
 
@@ -81,11 +72,11 @@ public static string TransformIndexHtml(object payload)
 
 ## Implementation Files
 
-| File | Action |
-|------|--------|
-| `src/plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Created |
-| `src/plugins/jellyfin/OpenWatchParty/OpenWatchPartyPlugin.csproj` | Added Newtonsoft.Json |
-| `docs/operations/installation.md` | Added automatic option |
+| File | Purpose |
+|------|---------|
+| `src/plugins/jellyfin/OpenWatchParty/FileTransformationIntegration.cs` | Registration & transformation callback |
+| `src/plugins/jellyfin/OpenWatchParty/OpenWatchPartyPlugin.csproj` | Newtonsoft.Json dependency |
+| `docs/operations/installation.md` | Installation instructions (Option A) |
 
 ## Error Handling
 
@@ -96,12 +87,16 @@ public static string TransformIndexHtml(object payload)
 | Exception during registration | Log debug, fallback to manual |
 | Script already present | Return unchanged (idempotent) |
 
-## Testing Checklist
+## Testing
 
-- [ ] Without file-transformation: verify manual method still works
-- [ ] With file-transformation: verify automatic injection works
-- [ ] Remove Custom HTML with file-transformation active: verify plugin works
-- [ ] Uninstall file-transformation: verify graceful fallback
+Verify the following scenarios:
+
+| Scenario | Expected Behavior |
+|----------|-------------------|
+| Without file-transformation installed | Manual method works via Custom HTML |
+| With file-transformation installed | Script is automatically injected |
+| Custom HTML removed, file-transformation active | Plugin still works |
+| File-transformation uninstalled | Graceful fallback to manual method |
 
 ## References
 

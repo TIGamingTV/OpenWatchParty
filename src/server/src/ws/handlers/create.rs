@@ -1,5 +1,5 @@
-use super::dispatch::{is_authenticated, send_error};
-use super::validation::{is_valid_media_id, is_valid_position, sanitize_name};
+use super::super::dispatch::{is_authenticated, send_error};
+use super::super::validation::{is_valid_media_id, is_valid_position, sanitize_name};
 use crate::messaging::{broadcast_room_list, send_to_client};
 use crate::room::close_room;
 use crate::types::{Clients, IncomingMessage, PlaybackState, Room, Rooms, WsMessage};
@@ -102,7 +102,7 @@ fn insert_and_notify(
     );
 }
 
-pub(super) async fn handle_create_room(
+pub(in crate::ws) async fn handle_create_room(
     client_id: &str,
     parsed: &IncomingMessage,
     clients: &Clients,
