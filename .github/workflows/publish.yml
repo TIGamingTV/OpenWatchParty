@@ -10,8 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: mhbxyz/owp-session-server
-
+  IMAGE_NAME: tigamingtv/owp-session-server
 permissions:
   contents: write
   packages: write
@@ -146,8 +145,8 @@ jobs:
              '.[0].versions = [{
                "version": $version,
                "changelog": $changelog,
-               "targetAbi": "10.10.0.0",
-               "sourceUrl": "https://github.com/mhbxyz/OpenWatchParty/releases/download/v\($version)/OpenWatchParty-v\($version).zip",
+               "targetAbi": "10.11.11.0",
+               "sourceUrl": "https://github.com/TIGamingTV/OpenWatchParty/releases/download/v\($version)/OpenWatchParty-v\($version).zip",
                "checksum": $checksum,
                "timestamp": $timestamp
              }] + .[0].versions' \
